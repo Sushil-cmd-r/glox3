@@ -63,7 +63,7 @@ func (*BadExpr) String() string {
 }
 
 func (b *BinaryExpr) String() string {
-	return fmt.Sprintf("%s %s %s", b.Op, b.Left, b.Right)
+	return fmt.Sprintf("(%s %s %s)", b.Op, b.Left, b.Right)
 }
 
 func (u *UnaryExpr) String() string {
