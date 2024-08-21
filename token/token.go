@@ -63,3 +63,27 @@ var tokens = [...]string{
 func (tok Token) String() string {
 	return tokens[tok]
 }
+
+const (
+	PrecLowest = iota
+	PrecEquality
+	PrecComparison
+	PrecTerm
+	PrecFactor
+	PrecUnary
+)
+
+func (tok Token) Precedence() int {
+	switch tok {
+	case EQL, NEQ:
+		return PrecEquality
+	case GTR, LSS, GEQ, LEQ:
+		return PrecComparison
+	case PLUS, MINUS:
+		return PrecTerm
+	case STAR, SLASH:
+		return PrecFactor
+	default:
+		return PrecLowest
+	}
+}
