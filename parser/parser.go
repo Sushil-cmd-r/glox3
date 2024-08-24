@@ -25,6 +25,27 @@ func New(source string) *Parser {
 	return p
 }
 
+func (p *Parser) Parse() []ast.Stmt {
+	stmts := make([]ast.Stmt, 0)
+	for p.tok != token.EOF {
+		stmt := p.parseStmt()
+		p.expectSemi()
+		stmts = append(stmts, stmt)
+	}
+	return stmts
+}
+
+func (p *Parser) parseStmt() ast.Stmt {
+	return p.parseExprStmt()
+}
+
+func (p *Parser) parseExprStmt() *ast.ExprStmt {
+	stmt := &ast.ExprStmt{}
+	stmt.Expression = p.parseExpr(token.PrecLowest)
+
+	return stmt
+}
+
 func (p *Parser) parseExpr(prec int) ast.Expr {
 	left := p.parseUnary()
 
@@ -71,7 +92,7 @@ func (p *Parser) parsePrimary() ast.Expr {
 		return &ast.BadExpr{}
 	default:
 		p.expectError("expression")
-		p.advance()
+		p.skipTo(stmtEnd)
 		return &ast.BadExpr{}
 	}
 }
@@ -102,6 +123,32 @@ func (p *Parser) parseGroup() *ast.GroupExpr {
 	p.expect(token.RPAREN)
 
 	return &ast.GroupExpr{Expression: expr}
+}
+
+var stmtStart = map[token.Token]bool{
+	token.NUMBER:     true,
+	token.IDENTIFIER: true,
+	token.STRING:     true,
+	token.ILLEGAL:    true,
+}
+
+var stmtEnd = map[token.Token]bool{
+	token.SEMI: true,
+}
+
+func (p *Parser) expectSemi() {
+	if p.tok == token.SEMI {
+		p.advance()
+		return
+	}
+	p.expectError(token.SEMI.String())
+	p.skipTo(stmtStart)
+}
+
+func (p *Parser) skipTo(to map[token.Token]bool) {
+	for p.tok != token.EOF && !to[p.tok] {
+		p.advance()
+	}
 }
 
 func (p *Parser) expectError(expect string) {

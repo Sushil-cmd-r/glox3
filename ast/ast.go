@@ -7,6 +7,22 @@ import (
 	"github.com/sushil-cmd-r/glox/token"
 )
 
+type Stmt interface {
+	stmtNode()
+}
+
+type (
+	ExprStmt struct {
+		Expression Expr
+	}
+)
+
+func (*ExprStmt) stmtNode() {}
+
+func (e *ExprStmt) String() string {
+	return fmt.Sprintf("%s;\n", e.Expression)
+}
+
 type Expr interface {
 	exprNode()
 }
