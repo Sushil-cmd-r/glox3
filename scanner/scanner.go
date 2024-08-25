@@ -8,8 +8,9 @@ type Scanner struct {
 	source   []byte
 	rdOffset int
 
-	ch     byte
-	offset int
+	ch         byte
+	offset     int
+	insertSemi bool
 }
 
 func Init(source []byte) *Scanner {
@@ -17,8 +18,9 @@ func Init(source []byte) *Scanner {
 		source:   source,
 		rdOffset: 0,
 
-		ch:     ' ',
-		offset: 0,
+		ch:         ' ',
+		offset:     0,
+		insertSemi: false,
 	}
 
 	s.advance()
@@ -30,7 +32,7 @@ func scanToken(tok token.Token) (token.Token, string) {
 }
 
 func (s *Scanner) skipWhitespaces() {
-	for s.ch == ' ' || s.ch == '\t' || s.ch == '\n' || s.ch == '\r' {
+	for s.ch == ' ' || s.ch == '\t' || (!s.insertSemi && s.ch == '\n') || (!s.insertSemi && s.ch == '\r') {
 		s.advance()
 	}
 }
@@ -40,9 +42,15 @@ func (s *Scanner) Scan() (tok token.Token, lit string) {
 	ch := s.ch
 	s.advance()
 
+	insertSemi := false
+
 	switch ch {
 	case eof:
-		tok, lit = scanToken(token.EOF)
+		if s.insertSemi {
+			tok, lit = scanToken(token.SEMI)
+		} else {
+			tok, lit = scanToken(token.EOF)
+		}
 	case '+':
 		tok, lit = scanToken(token.PLUS)
 	case '-':
@@ -59,10 +67,12 @@ func (s *Scanner) Scan() (tok token.Token, lit string) {
 		tok, lit = scanToken(token.LPAREN)
 	case ')':
 		tok, lit = scanToken(token.RPAREN)
+		insertSemi = true
 	case '{':
 		tok, lit = scanToken(token.LCURLY)
 	case '}':
 		tok, lit = scanToken(token.RCURLY)
+		insertSemi = true
 	case '=':
 		tok, lit = s.switch0(token.ASSIGN, token.EQL)
 	case '!':
@@ -73,6 +83,9 @@ func (s *Scanner) Scan() (tok token.Token, lit string) {
 		tok, lit = s.switch0(token.LSS, token.LEQ)
 	case '"':
 		tok, lit = s.scanString()
+		insertSemi = true
+	case '\n', '\r':
+		tok, lit = scanToken(token.SEMI)
 	default:
 		if isNum(ch) {
 			tok, lit = s.scanNumber()
@@ -81,7 +94,9 @@ func (s *Scanner) Scan() (tok token.Token, lit string) {
 		} else {
 			tok, lit = token.ILLEGAL, string(ch)
 		}
+		insertSemi = true
 	}
+	s.insertSemi = insertSemi
 	return
 }
 

@@ -25,6 +25,7 @@ func TestScan(t *testing.T) {
 		{token.SEMI, ";"},
 		{token.ILLEGAL, "&"},
 		{token.IDENTIFIER, "x"},
+		{token.SEMI, ";"},
 		{token.PLUS, "+"},
 		{token.ASSIGN, "="},
 		{token.SLASH, "/"},
@@ -37,6 +38,7 @@ func TestScan(t *testing.T) {
 		{token.GEQ, ">="},
 		{token.LEQ, "<="},
 		{token.ILLEGAL, "unterminated string"},
+		{token.SEMI, ";"},
 		{token.EOF, "eof"},
 	}
 

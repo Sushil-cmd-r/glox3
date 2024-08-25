@@ -8,8 +8,7 @@ import (
 )
 
 func TestParse(t *testing.T) {
-	input := `1 + 2;
-          x;
+	input := `1 + 2; x
            "hello";`
 	expect := []string{
 		"(+ 1 2);\n",
