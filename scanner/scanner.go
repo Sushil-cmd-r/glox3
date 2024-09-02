@@ -5,6 +5,7 @@ import "github.com/sushil-cmd-r/glox/token"
 const eof = 0
 
 type Scanner struct {
+	file     *token.File
 	source   []byte
 	rdOffset int
 
@@ -13,8 +14,9 @@ type Scanner struct {
 	insertSemi bool
 }
 
-func Init(source []byte) *Scanner {
+func Init(file *token.File, source []byte) *Scanner {
 	s := &Scanner{
+		file:     file,
 		source:   source,
 		rdOffset: 0,
 
@@ -37,9 +39,10 @@ func (s *Scanner) skipWhitespaces() {
 	}
 }
 
-func (s *Scanner) Scan() (tok token.Token, lit string) {
+func (s *Scanner) Scan() (tok token.Token, lit string, loc token.Loc) {
 	s.skipWhitespaces()
 	ch := s.ch
+	loc = token.Loc(s.offset)
 	s.advance()
 
 	insertSemi := false
@@ -162,6 +165,9 @@ func (s *Scanner) advance() {
 	}
 
 	s.offset = s.rdOffset
+	if s.ch == '\n' {
+		s.file.AddLine(s.offset)
+	}
 	s.ch = s.source[s.offset]
 
 	s.rdOffset += 1

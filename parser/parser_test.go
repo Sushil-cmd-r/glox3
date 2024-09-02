@@ -7,6 +7,11 @@ import (
 	"github.com/sushil-cmd-r/glox/token"
 )
 
+func makeParser(input string) *Parser {
+	f := token.NewFile("test.glox")
+	return New(f, input)
+}
+
 func TestParse(t *testing.T) {
 	input := `1 + 2; x
            "hello";`
@@ -16,7 +21,7 @@ func TestParse(t *testing.T) {
 		"hello;\n",
 	}
 
-	p := New(input)
+	p := makeParser(input)
 	stmts := p.Parse()
 
 	if p.errors.Len() != 0 {
@@ -38,7 +43,7 @@ func TestParseExpr(t *testing.T) {
 
 	expect := "(/ (+ (- x) 3.14) hello)"
 
-	p := New(input)
+	p := makeParser(input)
 	expr := p.parseExpr(token.PrecLowest)
 	if expr == nil {
 		t.Fatal("TestParseExpr: expected expression")

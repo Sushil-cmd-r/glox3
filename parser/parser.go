@@ -17,8 +17,8 @@ type Parser struct {
 	lit string
 }
 
-func New(source string) *Parser {
-	sc := scanner.Init([]byte(source))
+func New(file *token.File, source string) *Parser {
+	sc := scanner.Init(file, []byte(source))
 	p := &Parser{sc: sc, errors: &ErrorList{}}
 
 	p.advance()
@@ -177,5 +177,5 @@ func assert(cond bool, msg string) {
 }
 
 func (p *Parser) advance() {
-	p.tok, p.lit = p.sc.Scan()
+	p.tok, p.lit, _ = p.sc.Scan()
 }
