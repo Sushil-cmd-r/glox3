@@ -3,14 +3,17 @@ package parser
 import (
 	"fmt"
 	"strings"
+
+	"github.com/sushil-cmd-r/glox/token"
 )
 
 type Error struct {
 	Msg string
+	Loc token.Location
 }
 
 func (e Error) Error() string {
-	return e.Msg
+	return fmt.Sprintf("%s: %s", e.Loc, e.Msg)
 }
 
 type ErrorList []*Error
@@ -19,8 +22,8 @@ func (e *ErrorList) Len() int {
 	return len(*e)
 }
 
-func (e *ErrorList) Add(msg string) {
-	*e = append(*e, &Error{Msg: msg})
+func (e *ErrorList) Add(msg string, loc token.Location) {
+	*e = append(*e, &Error{Msg: msg, Loc: loc})
 }
 
 func (e *ErrorList) Error() string {

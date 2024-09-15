@@ -11,15 +11,17 @@ import (
 
 type Parser struct {
 	sc     *scanner.Scanner
+	file   *token.File
 	errors *ErrorList
 
 	tok token.Token
 	lit string
+	loc token.Loc
 }
 
 func New(file *token.File, source string) *Parser {
 	sc := scanner.Init(file, []byte(source))
-	p := &Parser{sc: sc, errors: &ErrorList{}}
+	p := &Parser{sc: sc, file: file, errors: &ErrorList{}}
 
 	p.advance()
 	return p
@@ -87,7 +89,7 @@ func (p *Parser) parsePrimary() ast.Expr {
 	case token.IDENTIFIER:
 		return p.parseIdentifier()
 	case token.ILLEGAL:
-		p.errors.Add(fmt.Sprintf("illegal token: %s", p.lit))
+		p.errors.Add(fmt.Sprintf("illegal token: %s", p.lit), p.file.LocationFor(p.loc))
 		p.advance()
 		return &ast.BadExpr{}
 	default:
@@ -152,7 +154,7 @@ func (p *Parser) skipTo(to map[token.Token]bool) {
 }
 
 func (p *Parser) expectError(expect string) {
-	p.errors.Add(fmt.Sprintf("expected %q, got %q", expect, p.tok))
+	p.errors.Add(fmt.Sprintf("expected %q, got %q", expect, p.tok), p.file.LocationFor(p.loc))
 }
 
 func (p *Parser) expect(tok token.Token) {
@@ -177,5 +179,5 @@ func assert(cond bool, msg string) {
 }
 
 func (p *Parser) advance() {
-	p.tok, p.lit, _ = p.sc.Scan()
+	p.tok, p.lit, p.loc = p.sc.Scan()
 }
