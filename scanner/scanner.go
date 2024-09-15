@@ -97,7 +97,10 @@ func (s *Scanner) Scan() (tok token.Token, lit string, loc token.Loc) {
 		} else {
 			tok, lit = token.ILLEGAL, string(ch)
 		}
-		insertSemi = true
+		switch tok {
+		case token.IDENTIFIER, token.NUMBER, token.ILLEGAL, token.TRUE, token.FALSE, token.NIL:
+			insertSemi = true
+		}
 	}
 	s.insertSemi = insertSemi
 	return
@@ -110,7 +113,7 @@ func (s *Scanner) scanIdentifier() (token.Token, string) {
 	}
 
 	lit := string(s.source[st:s.offset])
-	return token.IDENTIFIER, lit
+	return token.Lookup(lit)
 }
 
 func (s *Scanner) scanNumber() (token.Token, string) {

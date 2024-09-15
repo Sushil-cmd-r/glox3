@@ -44,9 +44,8 @@ func TestLoc(t *testing.T) {
 }
 
 func TestScan(t *testing.T) {
-	input := `12 3.14 "hello""a" "" wor1d 123abc  , ;&  x
+	input := `12 3.14 "hello""a" "" wor1d 123abc  , ;&  x true false nil; false
   + =/   -* ! != >< >= <= "unterminated `
-
 	expect := []struct {
 		tok token.Token
 		lit string
@@ -62,6 +61,11 @@ func TestScan(t *testing.T) {
 		{token.SEMI, ";"},
 		{token.ILLEGAL, "&"},
 		{token.IDENTIFIER, "x"},
+		{token.TRUE, "true"},
+		{token.FALSE, "false"},
+		{token.NIL, "nil"},
+		{token.SEMI, ";"},
+		{token.FALSE, "false"},
 		{token.SEMI, ";"},
 		{token.PLUS, "+"},
 		{token.ASSIGN, "="},

@@ -29,6 +29,12 @@ const (
 	LSS   // <
 	GEQ   // >=
 	LEQ   // <=
+
+	keywordStart
+	TRUE  // true
+	FALSE // false
+	NIL   // nil
+	keywordEnd
 )
 
 var tokens = [...]string{
@@ -58,10 +64,30 @@ var tokens = [...]string{
 	LSS:   "<",
 	GEQ:   ">=",
 	LEQ:   "<=",
+
+	TRUE:  "true",
+	FALSE: "false",
+	NIL:   "nil",
 }
 
 func (tok Token) String() string {
 	return tokens[tok]
+}
+
+var keywords map[string]Token
+
+func init() {
+	keywords = make(map[string]Token, keywordEnd-keywordStart+1)
+	for i := keywordStart + 1; i < keywordEnd; i++ {
+		keywords[tokens[i]] = i
+	}
+}
+
+func Lookup(ident string) (Token, string) {
+	if keyword, ok := keywords[ident]; ok {
+		return keyword, ident
+	}
+	return IDENTIFIER, ident
 }
 
 const (
