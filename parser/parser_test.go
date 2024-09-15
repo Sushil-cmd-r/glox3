@@ -14,10 +14,13 @@ func makeParser(input string) *Parser {
 
 func TestParse(t *testing.T) {
 	input := `1 + 2; x
+            true; nil
            "hello";`
 	expect := []string{
 		"(+ 1 2);\n",
 		"x;\n",
+		"true;\n",
+		"<nil>;\n",
 		"hello;\n",
 	}
 

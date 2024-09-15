@@ -88,6 +88,12 @@ func (p *Parser) parsePrimary() ast.Expr {
 		return p.parseGroup()
 	case token.IDENTIFIER:
 		return p.parseIdentifier()
+	case token.TRUE:
+		return p.parseTrue()
+	case token.FALSE:
+		return p.parseFalse()
+	case token.NIL:
+		return p.parseNil()
 	case token.ILLEGAL:
 		p.errors.Add(fmt.Sprintf("illegal token: %s", p.lit), p.file.LocationFor(p.loc))
 		p.advance()
@@ -117,6 +123,24 @@ func (p *Parser) parseIdentifier() *ast.IdentExpr {
 	_, lit := p.assertToken(token.IDENTIFIER)
 
 	return &ast.IdentExpr{Name: lit}
+}
+
+func (p *Parser) parseTrue() *ast.BoolExpr {
+	p.assertToken(token.TRUE)
+
+	return &ast.BoolExpr{Value: true}
+}
+
+func (p *Parser) parseFalse() *ast.BoolExpr {
+	p.assertToken(token.FALSE)
+
+	return &ast.BoolExpr{Value: false}
+}
+
+func (p *Parser) parseNil() *ast.NilExpr {
+	p.assertToken(token.NIL)
+
+	return &ast.NilExpr{}
 }
 
 func (p *Parser) parseGroup() *ast.GroupExpr {
