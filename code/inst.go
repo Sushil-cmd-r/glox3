@@ -4,6 +4,8 @@ import "fmt"
 
 type Inst [2]byte
 
+const MaxByte = 0b1111_1111 // 256
+
 func (i Inst) Opcode() byte {
 	return i[0]
 }
